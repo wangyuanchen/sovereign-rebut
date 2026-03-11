@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Loader2, Check, Zap, Infinity, Package } from "lucide-react";
 import {
   Dialog,
@@ -15,13 +15,13 @@ import { toast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import {
-  USDC_ADDRESS,
   ERC20_ABI,
   PLAN_PRICES,
   PLAN_DISPLAY_PRICES,
-  PLAN_CREDITS,
+  PAYMENT_TOKEN_SYMBOL,
+  getChainPaymentConfig,
   type PlanType,
-} from "@/lib/contracts/usdc";
+} from "@/lib/contracts/payment";
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -31,6 +31,7 @@ interface PaymentModalProps {
 
 export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) {
   const { address } = useAccount();
+  const chainId = useChainId();
   const { t } = useI18n();
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("pack10");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -103,6 +104,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
             txHash,
             walletAddress: address,
             plan: selectedPlan,
+            chainId,
           }),
         });
 
@@ -153,9 +155,19 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       return;
     }
 
+    const paymentConfig = getChainPaymentConfig(chainId);
+    if (!paymentConfig) {
+      toast({
+        title: t.nav.wrongNetwork,
+        description: "请切换到支持的网络后再支付",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       writeContract({
-        address: USDC_ADDRESS,
+        address: paymentConfig.tokenAddress,
         abi: ERC20_ABI,
         functionName: "transfer",
         args: [merchantWallet as `0x${string}`, PLAN_PRICES[selectedPlan]],
@@ -170,6 +182,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
   };
 
   const isPaying = isWritePending || isConfirming || isVerifying;
+  const currentChainConfig = getChainPaymentConfig(chainId);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -189,7 +202,9 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
           </span>
-          <span className="text-muted">{t.payment.network}</span>
+          <span className="text-muted">
+            {currentChainConfig ? `${currentChainConfig.name} · ${PAYMENT_TOKEN_SYMBOL}` : t.nav.wrongNetwork}
+          </span>
         </div>
 
         {/* Plan selection */}
@@ -225,7 +240,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
               </div>
               <div className="text-right">
                 <span className="text-lg font-bold text-red">{plan.price}</span>
-                <p className="text-xs text-muted">USDC</p>
+                <p className="text-xs text-muted">{PAYMENT_TOKEN_SYMBOL}</p>
               </div>
             </button>
           ))}
@@ -259,7 +274,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
               {t.payment.success}
             </>
           ) : (
-            `${t.payment.payBtn} ${PLAN_DISPLAY_PRICES[selectedPlan]} USDC`
+            `${t.payment.payBtn} ${PLAN_DISPLAY_PRICES[selectedPlan]} ${PAYMENT_TOKEN_SYMBOL}`
           )}
         </Button>
 

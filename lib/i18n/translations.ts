@@ -60,8 +60,8 @@ export const translations = {
     // Payment
     payment: {
       title: "购买额度",
-      subtitle: "使用 USDC 在 Base 网络上支付",
-      network: "Base 主网",
+      subtitle: "使用 USDT 在主流 EVM 网络上支付",
+      network: "多链网络",
       single: "单次",
       singleCredits: "1次",
       singleDesc: "尝鲜体验",
@@ -108,7 +108,7 @@ export const translations = {
     pricing: {
       title: "选择你的",
       titleHighlight: "武器",
-      subtitle: "使用 USDC 在 Base 网络上支付，即时到账，无需等待",
+      subtitle: "使用 USDT 在主流 EVM 网络上支付，即时到账，无需等待",
       features: {
         credits1: "1次生成额度",
         credits10: "10次生成额度",
@@ -122,10 +122,10 @@ export const translations = {
       connectToBuy: "连接钱包购买",
       faq: {
         title: "常见问题",
-        q1: "什么是 USDC？",
-        a1: "USDC 是一种稳定币，价值与美元 1:1 挂钩。你可以在交易所购买 USDC 并转入 Base 网络使用。",
-        q2: "什么是 Base 网络？",
-        a2: "Base 是由 Coinbase 推出的 Layer 2 网络，交易费用低廉，确认速度快。",
+        q1: "什么是 USDT？",
+        a1: "USDT 是一种稳定币，价格通常与美元接近 1:1。你可以在交易所购买后转入支持的网络使用。",
+        q2: "支持哪些网络？",
+        a2: "当前支持 Ethereum、Base、Arbitrum、Optimism、BNB Smart Chain。",
         q3: "购买后多久生效？",
         a3: "链上交易确认后立即生效，通常只需要几秒钟。",
         q4: "可以退款吗？",
@@ -189,8 +189,8 @@ export const translations = {
     // Payment
     payment: {
       title: "Purchase Credits",
-      subtitle: "Pay with USDC on Base network",
-      network: "Base Mainnet",
+      subtitle: "Pay with USDT on major EVM networks",
+      network: "Multi-chain",
       single: "Single",
       singleCredits: "1 credit",
       singleDesc: "Try it out",
@@ -237,7 +237,7 @@ export const translations = {
     pricing: {
       title: "Choose Your",
       titleHighlight: "Weapon",
-      subtitle: "Pay with USDC on Base network. Instant confirmation.",
+      subtitle: "Pay with USDT on major EVM networks. Instant confirmation.",
       features: {
         credits1: "1 generation credit",
         credits10: "10 generation credits",
@@ -251,10 +251,10 @@ export const translations = {
       connectToBuy: "Connect to Buy",
       faq: {
         title: "FAQ",
-        q1: "What is USDC?",
-        a1: "USDC is a stablecoin pegged 1:1 to USD. You can buy USDC on exchanges and transfer to Base network.",
-        q2: "What is Base network?",
-        a2: "Base is a Layer 2 network by Coinbase with low fees and fast confirmations.",
+        q1: "What is USDT?",
+        a1: "USDT is a stablecoin that typically tracks USD near 1:1. You can buy it on exchanges and transfer it on supported networks.",
+        q2: "Which networks are supported?",
+        a2: "Currently supported: Ethereum, Base, Arbitrum, Optimism, and BNB Smart Chain.",
         q3: "How fast does it activate?",
         a3: "Instantly after blockchain confirmation, usually just a few seconds.",
         q4: "Can I get a refund?",

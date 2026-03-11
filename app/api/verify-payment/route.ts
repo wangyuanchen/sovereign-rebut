@@ -1,23 +1,25 @@
 import { NextResponse } from "next/server";
-import { createPublicClient, http, parseAbiItem, decodeEventLog } from "viem";
-import { base } from "viem/chains";
+import { createPublicClient, http, decodeEventLog, type Chain } from "viem";
+import { mainnet, base, arbitrum, optimism, bsc } from "viem/chains";
 import { db } from "@/lib/db";
 import { users, payments, type PlanType } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { USDC_ADDRESS, PLAN_PRICES, PLAN_CREDITS, ERC20_ABI } from "@/lib/contracts/usdc";
-
-const publicClient = createPublicClient({
-  chain: base,
-  transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || "https://mainnet.base.org"),
-});
+import {
+  PLAN_PRICES,
+  PLAN_CREDITS,
+  ERC20_ABI,
+  getChainPaymentConfig,
+  isSupportedChainId,
+  type SupportedChainId,
+} from "@/lib/contracts/payment";
 
 const MERCHANT_WALLET = process.env.NEXT_PUBLIC_MERCHANT_WALLET?.toLowerCase();
 
 export async function POST(request: Request) {
   try {
-    const { txHash, walletAddress, plan } = await request.json();
+    const { txHash, walletAddress, plan, chainId } = await request.json();
 
-    if (!txHash || !walletAddress || !plan) {
+    if (!txHash || !walletAddress || !plan || typeof chainId !== "number") {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -30,6 +32,36 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    if (!isSupportedChainId(chainId)) {
+      return NextResponse.json(
+        { error: "Unsupported chain" },
+        { status: 400 }
+      );
+    }
+
+    const chainPaymentConfig = getChainPaymentConfig(chainId);
+    if (!chainPaymentConfig) {
+      return NextResponse.json(
+        { error: "Unsupported chain config" },
+        { status: 400 }
+      );
+    }
+
+    const chainById: Record<SupportedChainId, Chain> = {
+      1: mainnet,
+      8453: base,
+      42161: arbitrum,
+      10: optimism,
+      56: bsc,
+    };
+
+    const publicClient = createPublicClient({
+      chain: chainById[chainId],
+      transport: http(
+        process.env[chainPaymentConfig.rpcEnvVar] || chainPaymentConfig.defaultRpcUrl
+      ),
+    });
 
     // Check if tx already verified
     const existingPayment = await db
@@ -57,17 +89,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find the Transfer event
-    const transferEventSignature = parseAbiItem(
-      "event Transfer(address indexed from, address indexed to, uint256 value)"
-    );
-
     let validTransfer = false;
     let transferAmount = BigInt(0);
 
     for (const log of receipt.logs) {
-      // Check if this log is from the USDC contract
-      if (log.address.toLowerCase() !== USDC_ADDRESS.toLowerCase()) {
+      // Check if this log is from the configured token contract
+      if (log.address.toLowerCase() !== chainPaymentConfig.tokenAddress.toLowerCase()) {
         continue;
       }
 
@@ -107,7 +134,7 @@ export async function POST(request: Request) {
 
     if (!validTransfer) {
       return NextResponse.json(
-        { error: "No valid USDC transfer found to merchant wallet" },
+        { error: "No valid USDT transfer found to merchant wallet" },
         { status: 400 }
       );
     }

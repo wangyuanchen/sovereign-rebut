@@ -4,7 +4,7 @@
 
 [🇨🇳 中文版](./README.zh-CN.md) | English
 
-AI-powered comeback generator with 4 response styles. Web3 native with wallet auth & USDC payments on Base.
+AI-powered comeback generator with 4 response styles. Web3 native with wallet auth & USDT payments across major EVM chains.
 
 ---
 
@@ -12,9 +12,9 @@ AI-powered comeback generator with 4 response styles. Web3 native with wallet au
 
 - 🎯 **4 Comeback Styles** - Rational, Emotional, Subtle, Nuclear
 - 🌐 **i18n Support** - Chinese & English with auto-detection
-- 🤖 **Multi-AI Provider** - Claude, GPT-4, DeepSeek configurable
+- 🤖 **Unified OpenRouter** - Single gateway for model configuration
 - 🔐 **Web3 Auth** - Wallet-only login via RainbowKit
-- 💳 **On-chain Payment** - USDC on Base network
+- 💳 **On-chain Payment** - USDT on major EVM chains
 - 🎨 **Editorial Design** - Dark theme with grain texture
 
 ---
@@ -24,9 +24,9 @@ AI-powered comeback generator with 4 response styles. Web3 native with wallet au
 - **Frontend:** Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
 - **Web3:** Wagmi v2, Viem, RainbowKit, SIWE
 - **Database:** Drizzle ORM + PlanetScale (MySQL)
-- **AI:** Anthropic Claude / OpenAI / DeepSeek
+- **AI:** OpenRouter (single model gateway)
 - **Auth:** JWT with httpOnly cookies
-- **Payment:** USDC on Base (Chain ID: 8453)
+- **Payment:** USDT on Ethereum/Base/Arbitrum/Optimism/BSC
 
 ---
 
@@ -57,21 +57,10 @@ pnpm dev
 Create a `.env` file based on `.env.example`:
 
 ```bash
-# AI Provider Configuration
-# Options: anthropic | openai | deepseek
-AI_PROVIDER=anthropic
-
-# Anthropic (Claude)
-ANTHROPIC_API_KEY=your_api_key
-ANTHROPIC_MODEL=claude-sonnet-4-20250514
-
-# OpenAI (if using)
-OPENAI_API_KEY=your_api_key
-OPENAI_MODEL=gpt-4o
-
-# DeepSeek (if using)
-DEEPSEEK_API_KEY=your_api_key
-DEEPSEEK_MODEL=deepseek-chat
+# OpenRouter Configuration
+OPENROUTER_API_KEY=your_api_key
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=google/gemini-2.5-flash-lite
 
 # Database
 DATABASE_URL=mysql://user:password@host/database
@@ -81,7 +70,11 @@ JWT_SECRET=your_super_secret_key
 
 # Web3
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
+NEXT_PUBLIC_ETHEREUM_RPC_URL=https://ethereum-rpc.publicnode.com
 NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
+NEXT_PUBLIC_ARBITRUM_RPC_URL=https://arb1.arbitrum.io/rpc
+NEXT_PUBLIC_OPTIMISM_RPC_URL=https://mainnet.optimism.io
+NEXT_PUBLIC_BSC_RPC_URL=https://bsc-dataseed.binance.org
 
 # Payment
 NEXT_PUBLIC_MERCHANT_WALLET=0xYourWalletAddress
@@ -93,9 +86,9 @@ NEXT_PUBLIC_MERCHANT_WALLET=0xYourWalletAddress
 
 | Plan | Price | Credits |
 |------|-------|---------|
-| Single | $5 USDC | 1 |
-| Pack 10 | $19 USDC | 10 |
-| Unlimited | $49 USDC | ∞ |
+| Single | $5 USDT | 1 |
+| Pack 10 | $19 USDT | 10 |
+| Unlimited | $49 USDT | ∞ |
 
 New users get **3 free credits**!
 
@@ -167,7 +160,7 @@ sovereign-rebut/
 │   ├── ai/               # AI provider abstraction
 │   ├── db/               # Database schema & client
 │   ├── i18n/             # Internationalization
-│   └── contracts/        # USDC contract config
+│   └── contracts/        # Payment contract config
 ├── providers/            # Context providers
 └── hooks/                # Custom React hooks
 ```

@@ -8,7 +8,7 @@ import { PaymentModal } from "@/components/payment-modal";
 import { Button } from "@/components/ui/button";
 import { useCredits } from "@/hooks/use-credits";
 import { cn } from "@/lib/utils";
-import { PLAN_DISPLAY_PRICES, type PlanType } from "@/lib/contracts/usdc";
+import { PLAN_DISPLAY_PRICES, PAYMENT_TOKEN_SYMBOL, type PlanType } from "@/lib/contracts/payment";
 
 const PLANS: {
   id: PlanType;
@@ -73,7 +73,7 @@ export default function PricingPage() {
           选择你的<span className="text-red">武器</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
-          使用 USDC 在 Base 网络上支付，即时到账，无需等待
+          使用 {PAYMENT_TOKEN_SYMBOL} 在主流 EVM 网络上支付，即时到账，无需等待
         </p>
       </section>
 
@@ -109,7 +109,7 @@ export default function PricingPage() {
             {/* Price */}
             <div className="my-6">
               <span className="text-4xl font-bold text-red">{plan.price}</span>
-              <span className="ml-2 text-muted">USDC</span>
+              <span className="ml-2 text-muted">{PAYMENT_TOKEN_SYMBOL}</span>
               <p className="mt-1 text-sm text-muted">{plan.credits}</p>
             </div>
 
@@ -156,16 +156,15 @@ export default function PricingPage() {
         </h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-lg border border-border bg-surface p-6">
-            <h3 className="mb-2 font-medium text-text">什么是 USDC？</h3>
+            <h3 className="mb-2 font-medium text-text">什么是 USDT？</h3>
             <p className="text-sm text-muted">
-              USDC 是一种稳定币，价值与美元 1:1 挂钩。你可以在交易所购买 USDC
-              并转入 Base 网络使用。
+              USDT 是一种稳定币，价值与美元接近 1:1。你可以在交易所购买后转入常用 EVM 网络使用。
             </p>
           </div>
           <div className="rounded-lg border border-border bg-surface p-6">
-            <h3 className="mb-2 font-medium text-text">什么是 Base 网络？</h3>
+            <h3 className="mb-2 font-medium text-text">支持哪些网络？</h3>
             <p className="text-sm text-muted">
-              Base 是由 Coinbase 推出的 Layer 2 网络，交易费用低廉，确认速度快。
+              当前支持 Ethereum、Base、Arbitrum、Optimism、BNB Smart Chain。
             </p>
           </div>
           <div className="rounded-lg border border-border bg-surface p-6">

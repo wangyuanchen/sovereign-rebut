@@ -1,17 +1,11 @@
-import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { type GenerationOutput, type SceneType } from "@/lib/db/schema";
 import { type Locale } from "@/lib/i18n/translations";
 
-// Supported AI providers
-export type AIProvider = "anthropic" | "openai" | "deepseek";
+export type AIProvider = "openrouter";
 
-// Get configured provider from environment
 export function getAIProvider(): AIProvider {
-  const provider = process.env.AI_PROVIDER?.toLowerCase();
-  if (provider === "openai") return "openai";
-  if (provider === "deepseek") return "deepseek";
-  return "anthropic"; // default
+  return "openrouter";
 }
 
 // Get the system prompt based on locale
@@ -199,47 +193,20 @@ function parseResponse(text: string, locale: Locale): GenerationOutput {
   };
 }
 
-// Generate with Anthropic (Claude)
-async function generateWithAnthropic(
-  scenario: string,
-  sceneType: SceneType,
-  intensity: number,
-  locale: Locale
-): Promise<GenerationOutput> {
-  const client = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
-  });
-
-  const response = await client.messages.create({
-    model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514",
-    max_tokens: 2048,
-    system: getSystemPrompt(locale),
-    messages: [
-      {
-        role: "user",
-        content: getUserPrompt(scenario, sceneType, intensity, locale),
-      },
-    ],
-  });
-
-  const text =
-    response.content[0].type === "text" ? response.content[0].text : "";
-  return parseResponse(text, locale);
-}
-
-// Generate with OpenAI
-async function generateWithOpenAI(
+// Generate with OpenRouter (OpenAI-compatible API)
+async function generateWithOpenRouter(
   scenario: string,
   sceneType: SceneType,
   intensity: number,
   locale: Locale
 ): Promise<GenerationOutput> {
   const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1",
   });
 
   const response = await client.chat.completions.create({
-    model: process.env.OPENAI_MODEL || "gpt-4o",
+    model: process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash-lite",
     max_tokens: 2048,
     messages: [
       { role: "system", content: getSystemPrompt(locale) },
@@ -254,50 +221,12 @@ async function generateWithOpenAI(
   return parseResponse(text, locale);
 }
 
-// Generate with DeepSeek
-async function generateWithDeepSeek(
-  scenario: string,
-  sceneType: SceneType,
-  intensity: number,
-  locale: Locale
-): Promise<GenerationOutput> {
-  const client = new OpenAI({
-    apiKey: process.env.DEEPSEEK_API_KEY,
-    baseURL: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
-  });
-
-  const response = await client.chat.completions.create({
-    model: process.env.DEEPSEEK_MODEL || "deepseek-chat",
-    max_tokens: 2048,
-    messages: [
-      { role: "system", content: getSystemPrompt(locale) },
-      {
-        role: "user",
-        content: getUserPrompt(scenario, sceneType, intensity, locale),
-      },
-    ],
-  });
-
-  const text = response.choices[0]?.message?.content || "";
-  return parseResponse(text, locale);
-}
-
-// Main generation function - uses configured provider
+// Main generation function - uses OpenRouter
 export async function generateComeback(
   scenario: string,
   sceneType: SceneType,
   intensity: number,
   locale: Locale = "zh"
 ): Promise<GenerationOutput> {
-  const provider = getAIProvider();
-
-  switch (provider) {
-    case "openai":
-      return generateWithOpenAI(scenario, sceneType, intensity, locale);
-    case "deepseek":
-      return generateWithDeepSeek(scenario, sceneType, intensity, locale);
-    case "anthropic":
-    default:
-      return generateWithAnthropic(scenario, sceneType, intensity, locale);
-  }
+  return generateWithOpenRouter(scenario, sceneType, intensity, locale);
 }
