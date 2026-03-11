@@ -14,7 +14,6 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
     "@hookform/resolvers": "^3.9.1",
-    "@planetscale/database": "^1.19.0",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-radio-group": "^1.2.1",
@@ -31,6 +30,7 @@
     "nanoid": "^5.1.6",
     "next": "15.0.3",
     "openai": "^6.27.0",
+    "pg": "^8.20.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.2",
@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
+    "@types/pg": "^8.18.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.27",

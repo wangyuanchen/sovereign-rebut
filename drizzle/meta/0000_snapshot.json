@@ -109,8 +109,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "amount_usdc": {
-          "name": "amount_usdc",
+        "amount_usdt": {
+          "name": "amount_usdt",
           "type": "decimal(10,2)",
           "primaryKey": false,
           "notNull": true,

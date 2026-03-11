@@ -184,12 +184,12 @@ export async function POST(request: Request) {
     }
 
     // Record payment
-    const amountUsdc = Number(transferAmount) / 1e6;
+    const amountUsdt = Number(transferAmount) / 1e6;
     await db.insert(payments).values({
       txHash,
       walletAddress: walletAddress.toLowerCase(),
       plan: plan as PlanType,
-      amountUsdc: amountUsdc.toFixed(2),
+      amountUsdt: amountUsdt.toFixed(2),
     });
 
     // Get updated credits

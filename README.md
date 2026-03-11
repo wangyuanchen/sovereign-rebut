@@ -23,7 +23,7 @@ AI-powered comeback generator with 4 response styles. Web3 native with wallet au
 
 - **Frontend:** Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
 - **Web3:** Wagmi v2, Viem, RainbowKit, SIWE
-- **Database:** Drizzle ORM + PlanetScale (MySQL)
+- **Database:** Drizzle ORM + PostgreSQL
 - **AI:** OpenRouter (single model gateway)
 - **Auth:** JWT with httpOnly cookies
 - **Payment:** USDT on Ethereum/Base/Arbitrum/Optimism/BSC
@@ -63,7 +63,7 @@ OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 OPENROUTER_MODEL=google/gemini-2.5-flash-lite
 
 # Database
-DATABASE_URL=mysql://user:password@host/database
+DATABASE_URL=postgresql://user:password@host:5432/database
 
 # Auth
 JWT_SECRET=your_super_secret_key
@@ -109,7 +109,7 @@ CREATE TABLE generations (
   id VARCHAR(25) PRIMARY KEY,
   wallet_address VARCHAR(42) REFERENCES users,
   scenario TEXT,
-  scene_type ENUM('workplace','family','relationship','daily'),
+  scene_type scene_type,
   intensity INT,
   output JSON,
   created_at TIMESTAMP DEFAULT NOW()
@@ -119,8 +119,8 @@ CREATE TABLE generations (
 CREATE TABLE payments (
   tx_hash VARCHAR(66) PRIMARY KEY,
   wallet_address VARCHAR(42) REFERENCES users,
-  plan ENUM('single','pack10','unlimited'),
-  amount_usdc DECIMAL(10,2),
+  plan plan,
+  amount_usdt DECIMAL(10,2),
   verified_at TIMESTAMP DEFAULT NOW()
 );
 ```
