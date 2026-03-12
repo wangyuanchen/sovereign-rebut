@@ -34,7 +34,8 @@ export function Web3Provider({ children }: Web3ProviderProps) {
           process.env.NEXT_PUBLIC_BSC_RPC_URL || "https://bsc-dataseed.binance.org"
         ),
       },
-      ssr: true,
+      // Avoid server-side wallet storage initialization (e.g. indexedDB access).
+      ssr: false,
     });
   }, []);
 
