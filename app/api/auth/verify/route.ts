@@ -1,17 +1,31 @@
 import { NextResponse } from "next/server";
-import { verifyMessage } from "viem";
+import { verifyMessage, type Hex } from "viem";
 import { createToken, verifyNonce, setAuthCookie } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-function toHexSignature(input: unknown): `0x${string}` | null {
+type ViemSignature = Hex | { r: Hex; s: Hex; v: bigint };
+
+function parseWalletSignature(input: unknown): ViemSignature | null {
   if (typeof input !== "string") return null;
   const sig = input.trim();
-  if (!sig) return null;
+  if (!sig || !/^0x[0-9a-fA-F]+$/.test(sig)) return null;
 
-  if (/^0x[0-9a-fA-F]+$/.test(sig) && sig.length >= 130) {
-    return sig as `0x${string}`;
+  // Standard 65-byte: 0x + 130 hex = 132 chars
+  if (sig.length === 132) {
+    return sig as Hex;
+  }
+
+  // EIP-2098 compact 64-byte: 0x + 128 hex = 130 chars
+  if (sig.length === 130) {
+    const r = `0x${sig.slice(2, 66)}` as Hex;
+    const vsHex = sig.slice(66);
+    const vs = BigInt(`0x${vsHex}`);
+    const yParity = Number((vs >> BigInt(255)) & BigInt(1));
+    const s = vs & ((BigInt(1) << BigInt(255)) - BigInt(1));
+    const sHex = s.toString(16).padStart(64, "0");
+    return { r, s: `0x${sHex}` as Hex, v: BigInt(27 + yParity) };
   }
 
   return null;
@@ -40,9 +54,9 @@ export async function POST(request: Request) {
 
     // Verify the signature
     const message = `Welcome to Sovereign Rebut. Nonce: ${nonce}`;
-    const hexSig = toHexSignature(signature);
-    if (!hexSig) {
-      console.error("[Auth] Unsupported signature format:", typeof signature, String(signature).slice(0, 20), "length:", String(signature).length);
+    const parsedSig = parseWalletSignature(signature);
+    if (!parsedSig) {
+      console.error("[Auth] Unsupported signature:", typeof signature, "len:", String(signature).length);
       return NextResponse.json(
         { error: "Unsupported signature format" },
         { status: 400 }
@@ -54,10 +68,10 @@ export async function POST(request: Request) {
       isValid = await verifyMessage({
         address: address as `0x${string}`,
         message,
-        signature: hexSig,
+        signature: parsedSig,
       });
     } catch (verifyError) {
-      console.error("[Auth] verifyMessage threw:", verifyError);
+      console.error("[Auth] verifyMessage threw:", verifyError, "sig len:", String(signature).length);
       return NextResponse.json(
         { error: "Signature verification failed" },
         { status: 401 }
