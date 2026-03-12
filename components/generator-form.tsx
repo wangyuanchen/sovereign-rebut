@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useAccount } from "wagmi";
 import { Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useWalletAuth } from "@/hooks/use-wallet-auth";
 import { useI18n } from "@/lib/i18n";
 import { type GenerationOutput, type SceneType } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ export function GeneratorForm({
   setIsGenerating,
 }: GeneratorFormProps) {
   const { isConnected } = useAccount();
+  const { isAuthenticated, isAuthenticating, error: authError } = useWalletAuth();
   const { t, locale } = useI18n();
   const [intensity, setIntensity] = useState(3);
 
@@ -72,12 +74,24 @@ export function GeneratorForm({
       return;
     }
 
+    if (!isAuthenticated) {
+      toast({
+        title: authError ? "登录失败" : "正在登录",
+        description: authError
+          ? `钱包签名登录失败：${authError}`
+          : "请先在钱包中完成签名登录后再生成",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGenerating(true);
 
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ ...data, locale }),
       });
 
@@ -210,7 +224,7 @@ export function GeneratorForm({
       {/* Generate Button */}
       <button
         type="submit"
-        disabled={isGenerating || !isConnected}
+        disabled={isGenerating || !isConnected || isAuthenticating || !isAuthenticated}
         className={cn(
           "w-full bg-red text-white border-none py-5 font-display text-[18px] font-bold tracking-[1px] cursor-pointer transition-all relative overflow-hidden",
           "before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-white/[0.08]",
@@ -224,6 +238,11 @@ export function GeneratorForm({
             <>
               <Loader2 className="h-5 w-5 animate-spin" />
               {t.form.generating}
+            </>
+          ) : isAuthenticating ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              钱包签名登录中...
             </>
           ) : (
             <>
