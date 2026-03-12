@@ -8,14 +8,11 @@ import { generateComeback, getAIProvider } from "@/lib/ai";
 import { type Locale, locales } from "@/lib/i18n/translations";
 
 export const dynamic = "force-dynamic";
+const GUEST_TRIAL_COOKIE = "guest-trial-used";
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
     const walletAddress = await verifyAuth(request);
-    if (!walletAddress) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     // Parse and validate body
     const body = await request.json();
@@ -43,6 +40,44 @@ export async function POST(request: NextRequest) {
     // Validate locale
     const validLocale: Locale = locales.includes(locale) ? locale : "zh";
 
+    const provider = getAIProvider();
+    console.log(`[Generate] Using AI provider: ${provider}, locale: ${validLocale}`);
+
+    // Guest mode: allow one free generation without wallet login.
+    if (!walletAddress) {
+      const hasUsedGuestTrial = request.cookies.get(GUEST_TRIAL_COOKIE)?.value === "1";
+      if (hasUsedGuestTrial) {
+        return NextResponse.json(
+          { error: "Guest trial exhausted", needsWalletConnect: true },
+          { status: 401 }
+        );
+      }
+
+      const output = await generateComeback(
+        scenario,
+        sceneType as SceneType,
+        intensity,
+        validLocale
+      );
+
+      const response = NextResponse.json({
+        success: true,
+        output,
+        generationId: null,
+        remainingCredits: 0,
+        provider,
+        isGuest: true,
+      });
+      response.cookies.set(GUEST_TRIAL_COOKIE, "1", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 365,
+        path: "/",
+      });
+      return response;
+    }
+
     // Get user and check credits
     const [user] = await db
       .select()
@@ -60,10 +95,6 @@ export async function POST(request: NextRequest) {
         { status: 402 }
       );
     }
-
-    // Get AI provider info for logging
-    const provider = getAIProvider();
-    console.log(`[Generate] Using AI provider: ${provider}, locale: ${validLocale}`);
 
     // Generate comeback using configured AI provider
     const output = await generateComeback(

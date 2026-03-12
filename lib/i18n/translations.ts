@@ -32,6 +32,7 @@ export const translations = {
       generateBtn: "生成回怼方案",
       generating: "生成中...",
       connectFirst: "请先连接钱包以使用生成功能",
+      guestTrialHint: "未连接钱包可免费试用1次，用完请连接钱包继续",
     },
     // Scene types
     scenes: {
@@ -83,6 +84,10 @@ export const translations = {
     toast: {
       connectWallet: "请先连接钱包",
       connectWalletDesc: "需要连接钱包才能使用生成功能",
+      guestTrialUsed: "免费试用已用完",
+      guestTrialUsedDesc: "请连接钱包继续使用",
+      guestTrialSuccess: "试用成功",
+      guestTrialSuccessDesc: "你已使用 1 次游客免费试用，继续请连接钱包",
       insufficientCredits: "额度不足",
       insufficientCreditsDesc: "请购买额度后继续使用",
       generateSuccess: "生成成功",
@@ -161,6 +166,7 @@ export const translations = {
       generateBtn: "Generate Comeback",
       generating: "Generating...",
       connectFirst: "Please connect wallet to use this feature",
+      guestTrialHint: "One free guest try without wallet. Connect wallet after that.",
     },
     // Scene types
     scenes: {
@@ -212,6 +218,10 @@ export const translations = {
     toast: {
       connectWallet: "Please connect wallet",
       connectWalletDesc: "Wallet connection required",
+      guestTrialUsed: "Free trial used",
+      guestTrialUsedDesc: "Please connect wallet to continue",
+      guestTrialSuccess: "Guest trial used",
+      guestTrialSuccessDesc: "You used your 1 free guest try. Connect wallet to continue.",
       insufficientCredits: "Insufficient credits",
       insufficientCreditsDesc: "Please purchase credits to continue",
       generateSuccess: "Generated successfully",

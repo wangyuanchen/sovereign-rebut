@@ -65,16 +65,7 @@ export function GeneratorForm({
   const sceneType = watch("sceneType");
 
   const onSubmit = async (data: FormData) => {
-    if (!isConnected) {
-      toast({
-        title: t.toast.connectWallet,
-        description: t.toast.connectWalletDesc,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!isAuthenticated) {
+    if (isConnected && !isAuthenticated) {
       toast({
         title: authError ? "登录失败" : "正在登录",
         description: authError
@@ -98,6 +89,14 @@ export function GeneratorForm({
       const result = await response.json();
 
       if (!response.ok) {
+        if (result.needsWalletConnect) {
+          toast({
+            title: t.toast.guestTrialUsed,
+            description: t.toast.guestTrialUsedDesc,
+            variant: "destructive",
+          });
+          return;
+        }
         if (result.needsPayment) {
           toast({
             title: t.toast.insufficientCredits,
@@ -111,8 +110,8 @@ export function GeneratorForm({
 
       onGenerate(result.output, result.remainingCredits);
       toast({
-        title: t.toast.generateSuccess,
-        description: t.toast.generateSuccessDesc,
+        title: result.isGuest ? t.toast.guestTrialSuccess : t.toast.generateSuccess,
+        description: result.isGuest ? t.toast.guestTrialSuccessDesc : t.toast.generateSuccessDesc,
       });
     } catch (error) {
       toast({
@@ -224,7 +223,7 @@ export function GeneratorForm({
       {/* Generate Button */}
       <button
         type="submit"
-        disabled={isGenerating || !isConnected || isAuthenticating || !isAuthenticated}
+        disabled={isGenerating || (isConnected && (isAuthenticating || !isAuthenticated))}
         className={cn(
           "w-full bg-red text-white border-none py-5 font-display text-[18px] font-bold tracking-[1px] cursor-pointer transition-all relative overflow-hidden",
           "before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-white/[0.08]",
@@ -255,7 +254,7 @@ export function GeneratorForm({
 
       {!isConnected && (
         <p className="text-center text-sm text-muted font-mono tracking-wide">
-          {t.form.connectFirst}
+          {t.form.guestTrialHint}
         </p>
       )}
     </form>
