@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateNonce, storeNonce } from "@/lib/auth";
+import { generateNonce } from "@/lib/auth";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -12,8 +12,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const nonce = generateNonce();
-  storeNonce(address, nonce);
+  const nonce = generateNonce(address);
 
   return NextResponse.json({ nonce });
 }
