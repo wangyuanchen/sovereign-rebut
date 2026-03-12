@@ -9,9 +9,10 @@ import "./globals.css";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "RebutAI | 永远不再哑口无言",
-  description: "AI-powered comeback generator. Never be speechless again.",
-  keywords: ["AI", "comeback", "response generator", "Chinese", "回怼", "Web3"],
+  title: "RebutAI | Never Be Speechless Again",
+  description:
+    "AI-powered comeback generator for awkward moments. Get instant multi-style responses for work, relationships, and everyday conversations.",
+  keywords: ["AI", "comeback", "response generator", "argument helper", "Web3"],
 };
 
 export default function RootLayout({
@@ -20,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className="dark" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={`${playfair.variable} ${jetbrains.variable} ${notoSerifSC.variable} font-body antialiased min-h-screen bg-background text-text`}
       >
