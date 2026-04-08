@@ -1,136 +1,140 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Check, Zap, Package, Infinity } from "lucide-react";
 import { PaymentModal } from "@/components/payment-modal";
 import { Button } from "@/components/ui/button";
 import { useCredits } from "@/hooks/use-credits";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { PLAN_DISPLAY_PRICES, PAYMENT_TOKEN_SYMBOL, type PlanType } from "@/lib/contracts/payment";
-
-const PLANS: {
-  id: PlanType;
-  name: string;
-  price: string;
-  credits: string;
-  description: string;
-  features: string[];
-  icon: React.ReactNode;
-  popular?: boolean;
-}[] = [
-  {
-    id: "single",
-    name: "单次体验",
-    price: PLAN_DISPLAY_PRICES.single,
-    credits: "1次",
-    description: "尝鲜体验",
-    features: ["1次生成额度", "4种回怼风格", "复制和分享功能"],
-    icon: <Zap className="h-6 w-6" />,
-  },
-  {
-    id: "pack10",
-    name: "10次套餐",
-    price: PLAN_DISPLAY_PRICES.pack10,
-    credits: "10次",
-    description: "性价比之选",
-    features: ["10次生成额度", "4种回怼风格", "复制和分享功能", "历史记录查看"],
-    icon: <Package className="h-6 w-6" />,
-    popular: true,
-  },
-  {
-    id: "unlimited",
-    name: "终身无限",
-    price: PLAN_DISPLAY_PRICES.unlimited,
-    credits: "无限次",
-    description: "一次付费，永久使用",
-    features: [
-      "无限生成额度",
-      "4种回怼风格",
-      "复制和分享功能",
-      "历史记录查看",
-      "优先客服支持",
-    ],
-    icon: <Infinity className="h-6 w-6" />,
-  },
-];
+import { PLAN_DISPLAY_PRICES, PAYMENT_TOKEN_SYMBOL } from "@/lib/contracts/payment";
 
 export default function PricingPage() {
   const { isConnected } = useAccount();
   const { refetch } = useCredits();
+  const { t, locale } = useI18n();
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+
+  const plans = useMemo(
+    () =>
+      [
+        {
+          id: "single" as const,
+          name: t.payment.single,
+          price: PLAN_DISPLAY_PRICES.single,
+          credits: t.payment.singleCredits,
+          description: t.payment.singleDesc,
+          features: [
+            t.pricing.features.credits1,
+            t.pricing.features.styles,
+            t.pricing.features.copyShare,
+          ],
+          icon: <Zap className="h-6 w-6" />,
+          popular: false,
+        },
+        {
+          id: "pack10" as const,
+          name: t.payment.pack10,
+          price: PLAN_DISPLAY_PRICES.pack10,
+          credits: t.payment.pack10Credits,
+          description: t.payment.pack10Desc,
+          features: [
+            t.pricing.features.credits10,
+            t.pricing.features.styles,
+            t.pricing.features.copyShare,
+            t.pricing.features.history,
+          ],
+          icon: <Package className="h-6 w-6" />,
+          popular: true,
+        },
+        {
+          id: "unlimited" as const,
+          name: t.payment.unlimited,
+          price: PLAN_DISPLAY_PRICES.unlimited,
+          credits: t.payment.unlimitedCredits,
+          description: t.payment.unlimitedDesc,
+          features: [
+            t.pricing.features.creditsUnlimited,
+            t.pricing.features.styles,
+            t.pricing.features.copyShare,
+            t.pricing.features.history,
+            t.pricing.features.support,
+          ],
+          icon: <Infinity className="h-6 w-6" />,
+          popular: false,
+        },
+      ] as const,
+    [t]
+  );
 
   const handlePaymentSuccess = () => {
     refetch();
   };
 
   return (
-    <div className="mx-auto max-w-5xl">
-      {/* Header */}
+    <div className="mx-auto max-w-5xl px-4 pb-16 pt-8 sm:px-6">
       <section className="mb-12 text-center">
         <h1 className="font-display text-4xl font-black text-text sm:text-5xl">
-          选择你的<span className="text-red">武器</span>
+          {t.pricing.title}
+          {locale === "en" ? " " : ""}
+          <span className="text-red">{t.pricing.titleHighlight}</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
-          使用 {PAYMENT_TOKEN_SYMBOL} 在主流 EVM 网络上支付，即时到账，无需等待
+          {t.pricing.subtitle}
         </p>
       </section>
 
-      {/* Pricing cards */}
       <section className="mb-12 grid gap-6 md:grid-cols-3">
-        {PLANS.map((plan) => (
+        {plans.map((plan) => (
           <div
             key={plan.id}
             className={cn(
               "relative flex flex-col rounded-xl border p-6",
-              plan.popular
-                ? "border-red bg-surface"
-                : "border-border bg-surface"
+              plan.popular ? "border-red bg-surface" : "border-border bg-surface"
             )}
           >
             {plan.popular && (
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-red px-4 py-1 text-sm font-medium text-text">
-                最受欢迎
+                {t.pricing.mostPopular}
               </span>
             )}
 
-            {/* Icon */}
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-surface2 text-gold">
               {plan.icon}
             </div>
 
-            {/* Name & description */}
             <h3 className="font-display text-xl font-bold text-text">
               {plan.name}
             </h3>
             <p className="text-sm text-muted">{plan.description}</p>
 
-            {/* Price */}
             <div className="my-6">
               <span className="text-4xl font-bold text-red">{plan.price}</span>
               <span className="ml-2 text-muted">{PAYMENT_TOKEN_SYMBOL}</span>
               <p className="mt-1 text-sm text-muted">{plan.credits}</p>
             </div>
 
-            {/* Features */}
             <ul className="mb-6 flex-1 space-y-3">
-              {plan.features.map((feature) => (
-                <li key={feature} className="flex items-center gap-2 text-sm">
+              {plan.features.map((feature, idx) => (
+                <li
+                  key={`${plan.id}-${idx}`}
+                  className="flex items-center gap-2 text-sm"
+                >
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
                   <span className="text-text/80">{feature}</span>
                 </li>
               ))}
             </ul>
 
-            {/* CTA */}
             {isConnected ? (
               <Button
                 onClick={() => setIsPaymentOpen(true)}
                 variant={plan.popular ? "default" : "outline"}
                 className="w-full"
               >
-                立即购买
+                {t.pricing.buyNow}
               </Button>
             ) : (
               <ConnectButton.Custom>
@@ -140,7 +144,7 @@ export default function PricingPage() {
                     variant={plan.popular ? "default" : "outline"}
                     className="w-full"
                   >
-                    连接钱包购买
+                    {t.pricing.connectToBuy}
                   </Button>
                 )}
               </ConnectButton.Custom>
@@ -149,40 +153,30 @@ export default function PricingPage() {
         ))}
       </section>
 
-      {/* FAQ */}
       <section className="mb-12">
         <h2 className="mb-6 text-center font-display text-2xl font-bold text-text">
-          常见问题
+          {t.pricing.faq.title}
         </h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-lg border border-border bg-surface p-6">
-            <h3 className="mb-2 font-medium text-text">什么是 USDT？</h3>
-            <p className="text-sm text-muted">
-              USDT 是一种稳定币，价值与美元接近 1:1。你可以在交易所购买后转入常用 EVM 网络使用。
-            </p>
+            <h3 className="mb-2 font-medium text-text">{t.pricing.faq.q1}</h3>
+            <p className="text-sm text-muted">{t.pricing.faq.a1}</p>
           </div>
           <div className="rounded-lg border border-border bg-surface p-6">
-            <h3 className="mb-2 font-medium text-text">支持哪些网络？</h3>
-            <p className="text-sm text-muted">
-              当前支持 Ethereum、Base、Arbitrum、Optimism、BNB Smart Chain。
-            </p>
+            <h3 className="mb-2 font-medium text-text">{t.pricing.faq.q2}</h3>
+            <p className="text-sm text-muted">{t.pricing.faq.a2}</p>
           </div>
           <div className="rounded-lg border border-border bg-surface p-6">
-            <h3 className="mb-2 font-medium text-text">购买后多久生效？</h3>
-            <p className="text-sm text-muted">
-              链上交易确认后立即生效，通常只需要几秒钟。
-            </p>
+            <h3 className="mb-2 font-medium text-text">{t.pricing.faq.q3}</h3>
+            <p className="text-sm text-muted">{t.pricing.faq.a3}</p>
           </div>
           <div className="rounded-lg border border-border bg-surface p-6">
-            <h3 className="mb-2 font-medium text-text">可以退款吗？</h3>
-            <p className="text-sm text-muted">
-              由于链上交易的不可逆性，已完成的支付无法退款。请在购买前确认你的需求。
-            </p>
+            <h3 className="mb-2 font-medium text-text">{t.pricing.faq.q4}</h3>
+            <p className="text-sm text-muted">{t.pricing.faq.a4}</p>
           </div>
         </div>
       </section>
 
-      {/* Payment Modal */}
       <PaymentModal
         isOpen={isPaymentOpen}
         onClose={() => setIsPaymentOpen(false)}

@@ -116,6 +116,7 @@ export const translations = {
       title: "选择你的",
       titleHighlight: "武器",
       subtitle: "使用 USDT 在主流 EVM 网络上支付，即时到账，无需等待",
+      mostPopular: "最受欢迎",
       features: {
         credits1: "1次生成额度",
         credits10: "10次生成额度",
@@ -252,6 +253,7 @@ export const translations = {
       title: "Choose Your",
       titleHighlight: "Weapon",
       subtitle: "Pay with USDT on major EVM networks. Instant confirmation.",
+      mostPopular: "MOST POPULAR",
       features: {
         credits1: "1 generation credit",
         credits10: "10 generation credits",
