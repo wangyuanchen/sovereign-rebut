@@ -6,6 +6,10 @@
 
 AI-powered comeback generator with 4 response styles. Web3 native with wallet auth & USDT payments across major EVM chains.
 
+<a href="https://www.producthunt.com/products/rebutai?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-rebutai" target="_blank" rel="noopener noreferrer"><img alt="RebutAI - AI-powered rebuttals. Wallet login. No subscriptions. | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1118538&amp;theme=light&amp;t=1775631750896"></a>
+
+<a href="https://peerpush.net/p/rebutai" target="_blank" rel="noopener" style="width: 230px;"><img src="https://peerpush.net/p/rebutai/badge.png" alt="RebutAI badge" style="width: 230px;" /></a>
+
 ---
 
 ## ✨ Features

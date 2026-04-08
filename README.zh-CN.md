@@ -6,6 +6,10 @@
 
 AI驱动的回怼生成器，提供4种风格的精准反击方案。原生Web3，支持钱包登录和主流 EVM 链 USDT 支付。
 
+<a href="https://www.producthunt.com/products/rebutai?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-rebutai" target="_blank" rel="noopener noreferrer"><img alt="RebutAI - AI-powered rebuttals. Wallet login. No subscriptions. | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1118538&amp;theme=light&amp;t=1775631750896"></a>
+
+<a href="https://peerpush.net/p/rebutai" target="_blank" rel="noopener" style="width: 230px;"><img src="https://peerpush.net/p/rebutai/badge.png" alt="RebutAI badge" style="width: 230px;" /></a>
+
 ---
 
 ## ✨ 功能特点
