@@ -15,11 +15,19 @@ export function Navbar() {
 
   return (
     <nav className="flex justify-between items-center px-10 py-5 border-b border-border sticky top-0 bg-background/[0.92] backdrop-blur-[12px] z-50">
-      <Link href="/" className="flex items-center">
-        <span className="font-display text-[22px] font-black tracking-[-0.5px]">
-          Rebut<span className="text-red">AI</span>
-        </span>
-      </Link>
+      <div className="flex items-center gap-8">
+        <Link href="/" className="flex items-center">
+          <span className="font-display text-[22px] font-black tracking-[-0.5px]">
+            Rebut<span className="text-red">AI</span>
+          </span>
+        </Link>
+        <Link
+          href="/pricing"
+          className="font-mono text-[11px] text-muted tracking-[0.5px] hover:text-red transition-colors"
+        >
+          {t.nav.pricing}
+        </Link>
+      </div>
 
       <div className="flex items-center gap-5">
         {/* Language Toggle */}

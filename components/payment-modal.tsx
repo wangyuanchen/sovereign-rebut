@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useAccount,
+  useChainId,
+  useSwitchChain,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { Loader2, Check, Zap, Infinity, Package } from "lucide-react";
 import {
   Dialog,
@@ -19,6 +25,7 @@ import {
   PLAN_PRICES,
   PLAN_DISPLAY_PRICES,
   PAYMENT_TOKEN_SYMBOL,
+  SUPPORTED_CHAIN_IDS,
   getChainPaymentConfig,
   type PlanType,
 } from "@/lib/contracts/payment";
@@ -32,6 +39,7 @@ interface PaymentModalProps {
 export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) {
   const { address } = useAccount();
   const chainId = useChainId();
+  const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   const { t } = useI18n();
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("pack10");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -196,15 +204,43 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
           </DialogDescription>
         </DialogHeader>
 
-        {/* Network indicator */}
-        <div className="flex items-center gap-2 rounded-md border border-border bg-surface2 px-3 py-2 text-sm">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-          </span>
-          <span className="text-muted">
-            {currentChainConfig ? `${currentChainConfig.name} · ${PAYMENT_TOKEN_SYMBOL}` : t.nav.wrongNetwork}
-          </span>
+        {/* Network selection: user picks chain, then pays on that network */}
+        <div className="space-y-2">
+          <p className="font-mono text-[10px] tracking-[0.5px] text-muted uppercase">
+            {t.payment.selectNetwork}
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {SUPPORTED_CHAIN_IDS.map((id) => {
+              const cfg = getChainPaymentConfig(id);
+              if (!cfg) return null;
+              const active = chainId === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => switchChain?.({ chainId: id })}
+                  disabled={isPaying || isSwitchingChain}
+                  className={cn(
+                    "rounded-md border px-2 py-2.5 text-left text-xs transition-colors",
+                    active
+                      ? "border-red bg-surface2 text-text"
+                      : "border-border bg-background text-muted hover:border-muted hover:text-text"
+                  )}
+                >
+                  <span className="block font-mono text-[10px] leading-tight">{cfg.name}</span>
+                  <span className="mt-0.5 block text-[10px] text-muted">{PAYMENT_TOKEN_SYMBOL}</span>
+                </button>
+              );
+            })}
+          </div>
+          {currentChainConfig ? (
+            <p className="text-xs text-muted">
+              {currentChainConfig.name} · {PAYMENT_TOKEN_SYMBOL}
+              {isSwitchingChain ? " · …" : ""}
+            </p>
+          ) : (
+            <p className="text-xs text-red">{t.nav.wrongNetwork}</p>
+          )}
         </div>
 
         {/* Plan selection */}

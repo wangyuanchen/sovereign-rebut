@@ -11,6 +11,7 @@ export const translations = {
       unlimited: "无限",
       connectWallet: "连接钱包",
       wrongNetwork: "网络错误",
+      pricing: "定价与支付",
     },
     // Hero
     hero: {
@@ -63,6 +64,7 @@ export const translations = {
       title: "购买额度",
       subtitle: "使用 USDT 在主流 EVM 网络上支付",
       network: "多链网络",
+      selectNetwork: "选择支付网络",
       single: "单次",
       singleCredits: "1次",
       singleDesc: "尝鲜体验",
@@ -145,6 +147,7 @@ export const translations = {
       unlimited: "UNLIMITED",
       connectWallet: "CONNECT WALLET",
       wrongNetwork: "WRONG NETWORK",
+      pricing: "PRICING",
     },
     // Hero
     hero: {
@@ -197,6 +200,7 @@ export const translations = {
       title: "Purchase Credits",
       subtitle: "Pay with USDT on major EVM networks",
       network: "Multi-chain",
+      selectNetwork: "Select payment network",
       single: "Single",
       singleCredits: "1 credit",
       singleDesc: "Try it out",
